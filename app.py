@@ -250,9 +250,23 @@ def clear_chat():
     session_id = data.get('session_id')
     
     if session_id in sessions:
+        # Delete uploaded files from filesystem
+        for filename in sessions[session_id]['files']:
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            try:
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+            except Exception as e:
+                print(f"Error deleting file {filename}: {e}")
+        
+        # Clear session data
         sessions[session_id]['messages'] = []
+        sessions[session_id]['files'] = []
+        
+        return jsonify({'success': True})
     
-    return jsonify({'success': True})
+    return jsonify({'success': False, 'error': 'Session not found'})
+
 
 @app.route('/feedback', methods=['POST'])
 def submit_feedback():
@@ -302,3 +316,4 @@ def export_feedback():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+
