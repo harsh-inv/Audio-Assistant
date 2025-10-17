@@ -1515,31 +1515,47 @@
 
     async function clearChat() {
         if (!confirm('Are you sure you want to clear the chat history?')) return;
-
+        
         try {
             await fetch('/clear', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_id: sessionId })
             });
-
+            
+            // Clear chat messages
             document.getElementById('chatMessages').innerHTML = `
                 <div class="welcome-message">
                     <div class="welcome-avatar">
-                        <img src="/static/HR-chat-icon.png" alt="HR"
-                             onerror="this.onerror=null; this.src='/static/HR-chat-icon.jpg'">
+                        <img src="static/HR-chat-icon.png" alt="HR" onerror="this.onerror=null; this.src='static/HR-chat-icon.jpg';">
                     </div>
                     <h2>Hello! I'm your Audio Assistant.</h2>
                     <p>I have access to the audio collection and I'm ready to help. You can also upload additional audio files if needed.</p>
                 </div>
             `;
             
-            showToast('✅ Chat cleared', 'success');
+            // Clear file input
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            
+            // Clear file list display
+            const fileListDiv = document.getElementById('fileList');
+            if (fileListDiv) {
+                fileListDiv.innerHTML = '';
+            }
+            
+            // Update KB status
+            document.getElementById('kbStatus').textContent = 'No audio files found in audio collection. You can upload audio files to get started.';
+            
+            showToast('Chat cleared', 'success');
         } catch (error) {
             console.error('Clear error:', error);
-            showToast('❌ Clear failed', 'error');
+            showToast('Clear failed', 'error');
         }
     }
+
 
     async function exportFeedback() {
         try {
